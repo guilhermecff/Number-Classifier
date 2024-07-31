@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digit Classifier</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Digit Classifier</h1>
+        <div class="upload-section">
+            <label for="imageInput" class="upload-label">Choose an image</label>
+            <input type="file" id="imageInput" accept="image/*">
+            <button onclick="uploadImage()" id="predictButton" class="btn">Predict</button>
+        </div>
+        <p id="predictionResult"></p>
+    </div>
+
+    <script type="text/javascript">
+        async function uploadImage() {
+            const imageInput = document.getElementById('imageInput');
+            if (imageInput.files.length === 0) {
+                alert('Please select an image to upload.');
+                return;
+            }
+            const file = imageInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                document.getElementById('predictionResult').innerText = `Prediction: ${result.prediction}`;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('predictionResult').innerText = 'Prediction failed. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
